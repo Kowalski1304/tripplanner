@@ -4,6 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -45,4 +49,30 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function files(): MorphOne
+    {
+        return $this->morphOne(File::class, 'fileable');
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function teams(): BelongsToMany
+    {
+        return $this->belongsToMany(Team::class);
+    }
+
+    public function createdExpenses(): BelongsToMany
+    {
+        return $this->belongsToMany(Expense::class, 'creator_id');
+    }
+
+    public function expenses(): BelongsToMany
+    {
+        return $this->belongsToMany(Expense::class, 'creator_id');
+    }
+
 }

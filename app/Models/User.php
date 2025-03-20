@@ -65,14 +65,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Team::class);
     }
 
-    public function createdExpenses(): BelongsToMany
-    {
-        return $this->belongsToMany(Expense::class, 'creator_id');
-    }
-
     public function expenses(): BelongsToMany
     {
         return $this->belongsToMany(Expense::class, 'creator_id');
     }
+
+    //TODO expenses_pay
 
 }

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignIdFor(Poll::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(PollOption::class, 'option_id')->constrained()->cascadeOnDelete();
-            $table->date('vote_time');
             $table->timestamps();
         });
     }
@@ -29,6 +28,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // TODO видаляти відношення спояатку
+
         Schema::dropIfExists('poll_votes');
     }
 };

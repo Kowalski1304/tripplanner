@@ -15,9 +15,7 @@ return new class extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Team::class)->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class, 'user_1')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class, 'user_2')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Team::class)->nullable()->constrained();
             $table->timestamps();
         });
     }
@@ -27,6 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // TODO видаляти відношення спояатку
         Schema::dropIfExists('chats');
     }
 };

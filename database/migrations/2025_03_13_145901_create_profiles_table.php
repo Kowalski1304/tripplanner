@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(File::class, 'current_avatar_file_id')->nullable()->constrained('files')->nullOnDelete();
             $table->string('phone')->nullable();
             $table->timestamps();
         });
@@ -27,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // TODO видаляти відношення спояатку
+
         Schema::dropIfExists('profiles');
     }
 };

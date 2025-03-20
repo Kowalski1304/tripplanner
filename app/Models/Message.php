@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Message extends Model
 {
+    protected $fillable = ['chat_id', 'sender_id', 'recipient_id', 'content'];
+
     public function chat(): BelongsTo
     {
         return $this->belongsTo(Chat::class);
@@ -24,6 +26,7 @@ class Message extends Model
         return $this->morphOne(File::class, 'fileable');
     }
 
+    //TODO  додати json запису хто прочитав
     public function readBy(): BelongsToMany
     {
 

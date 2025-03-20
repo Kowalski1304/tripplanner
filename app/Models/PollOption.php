@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class PollOption extends Model
 {
-
+    protected $fillable = ['poll_id', 'option_text'];
 
     public function files(): MorphOne
     {

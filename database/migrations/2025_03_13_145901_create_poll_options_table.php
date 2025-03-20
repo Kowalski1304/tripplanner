@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('poll_options', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Poll::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class, 'creator_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained()->nullOnDelete();
             $table->string('option_text')->nullable();
             $table->timestamps();
         });
@@ -27,6 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // TODO видаляти відношення спояатку
+
         Schema::dropIfExists('poll_options');
     }
 };

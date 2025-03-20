@@ -17,12 +17,15 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'creator_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained()->nullOnDelete();
             $table->foreignIdFor(Team::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(ExpenseCategory::class, 'category_id')->nullable()->constrained('expense_categories')->nullOnDelete();
             $table->foreignIdFor(Currency::class, 'currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('amount', 10, 2);
             $table->text('details')->nullable();
+
+            // TODO expensed_add
+
             $table->date('expense_date')->nullable();
             $table->timestamps();
         });
@@ -33,6 +36,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // TODO видаляти відношення спояатку
+
         Schema::dropIfExists('expenses');
     }
 };

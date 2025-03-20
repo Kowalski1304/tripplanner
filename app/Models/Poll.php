@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Poll extends Model
 {
+    protected $fillable = ['question', 'chat_id'];
+
     public function chat(): BelongsTo
     {
         return $this->belongsTo(Chat::class);
@@ -14,6 +16,6 @@ class Poll extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'creator_id');
     }
 }

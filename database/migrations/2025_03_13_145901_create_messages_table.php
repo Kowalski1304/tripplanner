@@ -16,8 +16,10 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Chat::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class, 'sender_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class, 'recipient_id')->constrained()->cascadeOnDelete();
             $table->text('text');
+            $table->json('read_by')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +29,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // TODO видаляти відношення спояатку
+
         Schema::dropIfExists('messages');
     }
 };

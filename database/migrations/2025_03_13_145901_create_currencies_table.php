@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('symbol', 10);
-            $table->decimal('exchange_rate', 8, 4);
             $table->timestamps();
         });
     }

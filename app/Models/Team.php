@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Team extends Model
 {
+    protected $fillable = ['name', 'description', 'creator_id'];
 
     public function creator(): BelongsTo
     {
@@ -18,4 +19,6 @@ class Team extends Model
     {
         return $this->morphOne(File::class, 'fileable');
     }
+
+    //TODO перенести звязок між юзером та табл team_user
 }

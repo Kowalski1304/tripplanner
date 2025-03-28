@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->text('question');
             $table->foreignIdFor(Chat::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class, 'creator_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class, 'creator_id')->constrained();
             $table->timestamps();
         });
     }

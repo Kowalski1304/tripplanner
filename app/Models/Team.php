@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Team extends Model
@@ -20,5 +21,9 @@ class Team extends Model
         return $this->morphOne(File::class, 'fileable');
     }
 
-    //TODO перенести звязок між юзером та табл team_user
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'team_user', 'team_id', 'user_id')
+            ->withTimestamps();
+    }
 }

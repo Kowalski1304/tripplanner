@@ -72,4 +72,15 @@ class User extends Authenticatable
 
     //TODO expenses_pay
 
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class, 'user_id')
+            ->where('status', 'accepted');
+    }
+
+    public function pendingContacts()
+    {
+        return $this->hasMany(Contact::class, 'contact_id')
+            ->where('status', 'pending');
+    }
 }

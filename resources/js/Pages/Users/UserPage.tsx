@@ -1,8 +1,9 @@
 "use client"
 
-import { Head, Link, usePage } from "@inertiajs/react"
+import { Link } from "@inertiajs/react"
 import { useState } from "react"
 import axios from 'axios';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 interface User {
     id: number
@@ -22,54 +23,75 @@ interface Props {
     user: User
     isContact: boolean
     csrf?: string
+    apiToken?: string;
 }
 
-export default function PublicProfile({ user, isContact = false, csrf }: Props) {
+export default function PublicProfile({ user, isContact = false, apiToken }: Props) {
     const [isInContacts, setIsInContacts] = useState(isContact)
     const [loading, setLoading] = useState(false)
 
-    const { props } = usePage()
-
     const handleAddContact = async () => {
-        if (loading) return
-
-        setLoading(true)
-
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('api_token');
 
             const response = await axios.post(`/api/contacts/add/${user.id}`, {}, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : '',
-                    'X-CSRF-TOKEN': csrf || (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content,
+                    'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true
             });
 
             if (response.status === 200 || response.status === 201) {
-                setIsInContacts(true)
+                setIsInContacts(true);
                 return true;
             }
+            return false;
         } catch (error) {
             console.error('Error adding contact:', error);
-            // Тут можна додати обробку помилок авторизації
-            // Наприклад, перенаправлення на сторінку входу, якщо статус 401
             if (axios.isAxiosError(error) && error.response?.status === 401) {
-                // Перенаправлення на сторінку входу
                 window.location.href = '/login';
             }
             return false;
         } finally {
-            setLoading(false)
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteContact = async () => {
+        try {
+            const token = localStorage.getItem('api_token');
+
+            const response = await axios.delete(`/api/contacts/remove/${user.id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                withCredentials: true
+            });
+
+            if (response.status === 201) {
+                setIsInContacts(false);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error adding contact:', error);
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                window.location.href = '/login';
+            }
+            return false;
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <Head title={`Профіль ${user.name}`} />
-
+        <AuthenticatedLayout
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Profile</h2>}
+        >
             <div className="py-12">
                 <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
@@ -121,7 +143,8 @@ export default function PublicProfile({ user, isContact = false, csrf }: Props) 
                                         </button>
                                     ) : (
                                         <button
-                                            disabled
+                                            onClick={handleDeleteContact}
+                                            disabled={loading}
                                             className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
                                         >
                                             <svg
@@ -141,7 +164,7 @@ export default function PublicProfile({ user, isContact = false, csrf }: Props) 
                                     )}
 
                                     <Link
-                                        href={route("messages.create", { userId: user.id })}
+                                        // href={route("messages.create", { userId: user.id })}
                                         className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                                     >
                                         <svg
@@ -177,6 +200,6 @@ export default function PublicProfile({ user, isContact = false, csrf }: Props) 
                     </div>
                 </div>
             </div>
-        </div>
+        </AuthenticatedLayout>
     )
 }

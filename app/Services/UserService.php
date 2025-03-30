@@ -29,9 +29,18 @@ class UserService
     {
         $currentUser = Auth::user();
         $is_contact = $this->contactService->hasContact($currentUser, $contactUser);
+        $apiToken = request()->session()->get('api_token');
+
+        if (!$apiToken) {
+            $currentUser = Auth::user();
+            $token = $currentUser->createToken('api_token');
+            $apiToken = $token->plainTextToken;
+            request()->session()->put('api_token', $apiToken);
+        }
 
         return Inertia::render('Users/UserPage', [
-            'user' => $currentUser,
+            'user' => $contactUser,
+            'apiToken' => $apiToken,
             'isContact' => $is_contact,
         ]);
     }

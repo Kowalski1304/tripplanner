@@ -6,7 +6,6 @@ use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
 class ContactService
 {
@@ -26,9 +25,9 @@ class ContactService
         return response()->json($pendingContacts);
     }
 
-    public function addContact(User $currentUser, User $contactUser): bool
+    public function addContact(User $currentUser, User $contactUser): bool|Contact
     {
-        if (!$this->hasContact($contactUser, $contactUser)) {
+        if (!$this->hasContact($currentUser, $contactUser)) {
             return $currentUser->contacts()->create([
                 'contact_id' => $contactUser->id,
                 'status' => 'pending'
@@ -65,12 +64,8 @@ class ContactService
 
     public function hasContact(User $currentUser, User $contactUser): bool
     {
-        return Contact::where(function($query) use ($currentUser, $contactUser) {
-            $query->where('user_id', $contactUser->id)
-                ->where('contact_id', $currentUser->id);
-        })->orWhere(function($query) use ($currentUser, $contactUser) {
-            $query->where('user_id', $currentUser->id)
-                ->where('contact_id', $contactUser->id);
-        })->exists();
+        return Contact::query()
+            ->where('user_id', $currentUser->id)
+            ->where('contact_id', $contactUser->id)->exists();
     }
 }

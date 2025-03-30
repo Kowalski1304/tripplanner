@@ -28,8 +28,6 @@ class ContactController extends Controller
 
     public function addContact(User $contactUser)
     {
-        Log::info($contactUser->id);
-        Log::info(Auth::user()->id);
         $currentUser = Auth::user();
 
         if ($currentUser->id === $contactUser->id) {
@@ -41,7 +39,7 @@ class ContactController extends Controller
         $result = $this->contactService->addContact($currentUser, $contactUser);
 
         return $result
-            ? response()->json(['message' => 'Contact request sent'], 200)
+            ? response()->json(['message' => 'Contact request sent'], 201)
             : response()->json(['message' => 'Contact already exists'], 400);
     }
 

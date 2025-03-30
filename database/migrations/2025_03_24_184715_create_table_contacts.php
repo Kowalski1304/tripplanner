@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('contact_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['pending', 'accepted'])->default('pending');
             $table->timestamps();
 
             $table->unique(['user_id', 'contact_id']);

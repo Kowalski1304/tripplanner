@@ -41,7 +41,7 @@ class ContactService
         return $this->contactService->getPendingContacts();
     }
 
-    public function addContact(User $currentUser, User $contactUser): bool
+    public function addContact(User $currentUser, User $contactUser): bool|Contact
     {
         return $this->contactService->addContact($currentUser, $contactUser);
     }

@@ -7,9 +7,8 @@ Route::middleware('auth:sanctum')
     ->controller(ContactController::class)
     ->prefix('/contacts')
     ->group(function () {
-        Route::post('/add/{user}', 'addContact')->name('contacts.add');
-        Route::post('/accept', 'acceptContact');
-        Route::delete('/remove', 'removeContact');
+        Route::post('/add/{contactUser}', 'addContact')->name('contacts.add');
+        Route::delete('/remove/{contactUser}', 'removeContact');
         Route::get('', 'getContacts');
         Route::get('/pending', 'getPendingContacts');
     });

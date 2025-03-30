@@ -20,12 +20,6 @@ class ContactController extends Controller
         return $this->contactService->getAllContactsPage();
     }
 
-    public function getAllContactsInvitePage()
-    {
-        return $this->contactService->getAllContactsInvitePage();
-    }
-
-
     public function addContact(User $contactUser)
     {
         $currentUser = Auth::user();
@@ -43,17 +37,6 @@ class ContactController extends Controller
             : response()->json(['message' => 'Contact already exists'], 400);
     }
 
-    public function acceptContact(User $contactUser)
-    {
-        $currentUser = Auth::user();
-
-        $result = $this->contactService->acceptContact($currentUser, $contactUser);
-
-        return $result
-            ? response()->json(['message' => 'Contact confirmed'], 200)
-            : response()->json(['message' => 'Contact verification failed'], 400);
-    }
-
     public function removeContact(User $contactUser)
     {
         $currentUser = Auth::user();
@@ -61,17 +44,12 @@ class ContactController extends Controller
         $result = $this->contactService->removeContact($currentUser, $contactUser);
 
         return $result
-            ? response()->json(['message' => 'Contact deleted'], 200)
+            ? response()->json(['message' => 'Contact deleted'], 201)
             : response()->json(['message' => 'Unable to delete contact'], 400);
     }
 
     public function getContacts()
     {
         return $this->contactService->getContacts();
-    }
-
-    public function getPendingContacts()
-    {
-        return $this->contactService->getPendingContacts();
     }
 }

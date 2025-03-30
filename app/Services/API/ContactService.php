@@ -17,14 +17,6 @@ class ContactService
         return response()->json($contacts);
     }
 
-    public function getPendingContacts(): JsonResponse
-    {
-        $currentUser = Auth::user();
-        $pendingContacts = $currentUser->pendingContacts()->with('user')->get();
-
-        return response()->json($pendingContacts);
-    }
-
     public function addContact(User $currentUser, User $contactUser): bool|Contact
     {
         if (!$this->hasContact($currentUser, $contactUser)) {
@@ -37,35 +29,19 @@ class ContactService
         return false;
     }
 
-    public function acceptContact(User $currentUser, User $contactUser): bool
-    {
-        $contact = Contact::where('user_id', $contactUser->id)
-            ->where('contact_id', $currentUser->id)
-            ->first();
-
-        if ($contact) {
-            $contact->update(['status' => 'accepted']);
-            return true;
-        }
-
-        return false;
-    }
-
     public function removeContact(User $currentUser, User $contactUser)
     {
-        return Contact::where(function($query) use ($currentUser, $contactUser) {
-            $query->where('user_id', $contactUser->id)
-                ->where('contact_id', $currentUser->id);
-        })->orWhere(function($query) use ($currentUser, $contactUser) {
-            $query->where('user_id', $currentUser->id)
-                ->where('contact_id', $contactUser->id);
-        })->delete();
+        return Contact::query()
+            ->where('user_id', $currentUser->id)
+            ->where('contact_id', $contactUser->id)
+            ->delete();
     }
 
     public function hasContact(User $currentUser, User $contactUser): bool
     {
         return Contact::query()
             ->where('user_id', $currentUser->id)
-            ->where('contact_id', $contactUser->id)->exists();
+            ->where('contact_id', $contactUser->id)
+            ->exists();
     }
 }

@@ -27,6 +27,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('polls', function (Blueprint $table) {
+            $table->dropForeign(['chat_id']);
+            $table->dropForeign(['creator_id']);
+        });
+
         Schema::dropIfExists('polls');
     }
 };

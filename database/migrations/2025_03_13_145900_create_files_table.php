@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('path');
-            $table->morphs('fileble_id');
-            $table->string('fileble_type')->nullable();
+            $table->morphs('fileable');
             $table->string('type')->nullable();
             $table->string('size')->nullable();
             $table->integer('number')->default(0);

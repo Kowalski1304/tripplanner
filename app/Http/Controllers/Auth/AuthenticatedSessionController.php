@@ -33,9 +33,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $token = $request->user()->createToken('api_token')->plainTextToken;
+        $apiToken = $request->user()->createToken('api_token')->plainTextToken;
 
-        return redirect()->intended(route('dashboard', $token));
+        return redirect()->intended(route('dashboard', ['apiToken' => $apiToken]));
     }
 
     /**

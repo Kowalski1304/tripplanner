@@ -1,7 +1,17 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import { useEffect } from "react";
 
-export default function Dashboard() {
+interface Props {
+    apiToken?: string;
+}
+
+export default function Dashboard({ apiToken }: Props) {
+    useEffect(() => {
+        if (apiToken) {
+            localStorage.setItem('api_token', apiToken);
+        }
+    }, [apiToken]);
     return (
         <AuthenticatedLayout
             header={

@@ -11,29 +11,26 @@ interface User {
     profile: {
         id: number
         bio?: string
-        location?: string
-        files?: {
-            id: number
-            path: string
-        }[]
+        address?: string
     }
+    files?: {
+        id: number
+        path: string
+    }[]
 }
 
 interface Props {
     user: User
     isContact: boolean
-    csrf?: string
-    apiToken?: string;
 }
 
-export default function PublicProfile({ user, isContact = false, apiToken }: Props) {
+export default function PublicProfile({ user, isContact = false }: Props) {
     const [isInContacts, setIsInContacts] = useState(isContact)
     const [loading, setLoading] = useState(false)
 
     const handleAddContact = async () => {
         try {
             const token = localStorage.getItem('api_token');
-
             const response = await axios.post(`/api/contacts/add/${user.id}`, {}, {
                 headers: {
                     'Accept': 'application/json',
@@ -99,9 +96,9 @@ export default function PublicProfile({ user, isContact = false, apiToken }: Pro
                         <div className="relative h-48 bg-gradient-to-r from-blue-500 to-indigo-600">
                             <div className="absolute -bottom-16 left-6">
                                 <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white dark:border-gray-800">
-                                    {user.profile?.files && user.profile.files.length > 0 ? (
+                                    {user?.files && user.files.length > 0 ? (
                                         <img
-                                            src={user.profile.files[0].path || "/placeholder.svg"}
+                                            src={user.files[0].path || "/placeholder.svg"}
                                             alt={`${user.name}`}
                                             className="h-full w-full object-cover"
                                         />
@@ -119,8 +116,8 @@ export default function PublicProfile({ user, isContact = false, apiToken }: Pro
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                     <h1 className="text-2xl font-bold">{user.name}</h1>
-                                    {user.profile?.location && (
-                                        <p className="mt-1 text-gray-600 dark:text-gray-400">{user.profile.location}</p>
+                                    {user.profile?.address && (
+                                        <p className="mt-1 text-gray-600 dark:text-gray-400">{user.profile.address}</p>
                                     )}
                                 </div>
 

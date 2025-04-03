@@ -75,13 +75,7 @@ class User extends Authenticatable
 
     public function contacts()
     {
-        return $this->hasMany(Contact::class, 'user_id')
-            ->where('status', 'accepted');
+        return $this->hasMany(Contact::class, 'user_id');
     }
 
-    public function pendingContacts()
-    {
-        return $this->hasMany(Contact::class, 'contact_id')
-            ->where('status', 'pending');
-    }
 }

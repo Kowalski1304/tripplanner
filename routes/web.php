@@ -4,10 +4,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 require __DIR__.'/auth.php';
+
+Route::get('private-file/{path}', function ($path) {
+    return Storage::disk('private')->response('team_files/' . $path);
+})->middleware('auth', 'signed')->name('private.file');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

@@ -26,7 +26,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // TODO видаляти відношення спояатку
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+        });
 
         Schema::dropIfExists('profiles');
     }

@@ -27,7 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // TODO видаляти відношення спояатку
+        Schema::table('poll_options', function (Blueprint $table) {
+            $table->dropForeign(['poll_id']);
+            $table->dropForeign(['user_id']);
+        });
 
         Schema::dropIfExists('poll_options');
     }

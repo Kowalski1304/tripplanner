@@ -5,14 +5,15 @@ namespace App\Services;
 use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use App\Services\API\ContactService as APIContactService;
 
 class ContactService
 {
-    public function __construct(private readonly APIContactService $contactService)
+    public function __construct()
     {
     }
+
     public function getAllContactsPage()
     {
         $users = User::query()
@@ -24,40 +25,50 @@ class ContactService
             'users' => $users,
         ]);
     }
-
-    public function getAllContactsInvitePage()
-    {
-
-    }
-
-
     public function getContacts(): JsonResponse
     {
-        return $this->contactService->getContacts();
-    }
+        $currentUser = Auth::user();
+        $contacts = $currentUser->contacts()->with('contactUser')->get();
 
-    public function getPendingContacts(): JsonResponse
-    {
-        return $this->contactService->getPendingContacts();
+        return response()->json($contacts);
     }
 
     public function addContact(User $currentUser, User $contactUser): bool|Contact
     {
-        return $this->contactService->addContact($currentUser, $contactUser);
-    }
+        if (!$this->hasContact($currentUser, $contactUser)) {
+            return $currentUser->contacts()->create([
+                'contact_id' => $contactUser->id,
+                'status' => 'pending'
+            ]);
+        }
 
-    public function acceptContact(User $currentUser, User $contactUser): bool
-    {
-        return $this->contactService->acceptContact($currentUser, $contactUser);
+        return false;
     }
 
     public function removeContact(User $currentUser, User $contactUser)
     {
-        return $this->contactService->removeContact($currentUser, $contactUser);
+        return Contact::query()
+            ->where('user_id', $currentUser->id)
+            ->where('contact_id', $contactUser->id)
+            ->delete();
     }
 
-    public function hasContact(User $currentUser, User $contactUser): Contact
+    public function hasContact(User $currentUser, User $contactUser): bool
     {
-        return $this->contactService->hasContact($currentUser, $contactUser);
+        return Contact::query()
+            ->where('user_id', $currentUser->id)
+            ->where('contact_id', $contactUser->id)
+            ->exists();
+    }
+
+    public function hasMutualContact(User $currentUser, User $contactUser): bool
+    {
+        return Contact::query()
+            ->where('user_id', $currentUser->id)
+            ->where('contact_id', $contactUser->id)
+            ->exists() && Contact::query()
+            ->where('user_id', $contactUser->id)
+            ->where('contact_id', $currentUser->id)
+            ->exists();
     }
 }

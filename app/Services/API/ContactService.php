@@ -9,25 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ContactService
 {
-    public function getContacts(): JsonResponse
-    {
-        $currentUser = Auth::user();
-        $contacts = $currentUser->contacts()->with('contactUser')->get();
-
-        return response()->json($contacts);
-    }
-
-    public function addContact(User $currentUser, User $contactUser): bool|Contact
-    {
-        if (!$this->hasContact($currentUser, $contactUser)) {
-            return $currentUser->contacts()->create([
-                'contact_id' => $contactUser->id,
-                'status' => 'pending'
-            ]);
-        }
-
-        return false;
-    }
 
     public function removeContact(User $currentUser, User $contactUser)
     {

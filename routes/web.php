@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -43,3 +44,11 @@ Route::prefix('users')
     Route::get('/{user}', 'show')->name('users.show');
 
 });
+Route::prefix('team')
+    ->middleware(['auth', 'verified'])
+    ->controller(TeamController::class)
+    ->group(function () {
+        Route::get('/', 'createTeamPage')->name('team.index');
+//        Route::get('/{user}', 'show')->name('users.show');
+    });
+

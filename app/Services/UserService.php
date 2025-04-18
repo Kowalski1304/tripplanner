@@ -30,25 +30,21 @@ class UserService
         $currentUser = Auth::user();
         $isСontact = $this->contactService->hasContact($currentUser, $contactUser);
         $mutualContact = $this->contactService->hasMutualContact($currentUser, $contactUser);
-        $isSameUser = $currentUser->id === $contactUser->id;
-        if ($contactUser->files && Storage::disk('private')->exists($contactUser->files->path)) {
-            $fileUrl = URL::temporarySignedRoute(
-                'private.file',
-                now()->addMinutes(5),
-                ['path' => basename($contactUser->files->path)]
-            );
+        $isSameUser = $currentUser->getKey() === $contactUser->getKey();
+        if ($contactUser->file && Storage::disk('private')->exists($contactUser->file->path)) {
+            $fileUrl = asset($contactUser->file->path);
         }
 
         return Inertia::render('Users/UserPage', [
             'user' => [
-                'id' => $contactUser->id,
+                'id' => $contactUser->getKey(),
                 'name' => $contactUser->name,
                 'profile' => [
-                    'phone' => $mutualContact || $isSameUser ? $contactUser->profile?->phone : null,
+                    'phone' => $contactUser->profile?->phone,
                 ],
                 'files' => [
                     [
-                        'id' => $contactUser->files?->id,
+                        'id' => $contactUser->files?->getKey(),
                         'path' => $fileUrl ?? null,
                     ]
                 ],

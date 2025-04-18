@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -36,6 +37,22 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        if ($request->hasFile('avatar')) {
+            if ($request->user()->files) {
+                Storage::delete($request->user()->files->path);
+                $request->user()->files->delete();
+            }
+
+            $path = $request->file('avatar')->store('avatars');
+
+            $request->user()->files()->create([
+                'name' => $request->file('avatar')->getClientOriginalName(),
+                'path' => $path,
+                'type' => $request->file('avatar')->getMimeType(),
+                'size' => $request->file('avatar')->getSize()
+            ]);
+        }
 
         return Redirect::route('profile.edit');
     }

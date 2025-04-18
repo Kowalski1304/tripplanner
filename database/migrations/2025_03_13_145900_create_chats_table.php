@@ -25,7 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // TODO видаляти відношення спояатку
+        Schema::table('chats', function (Blueprint $table) {
+            $table->dropForeign(['team_id']);
+        });
+
         Schema::dropIfExists('chats');
     }
 };

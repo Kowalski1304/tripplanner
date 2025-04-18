@@ -36,7 +36,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // TODO видаляти відношення спояатку
+        Schema::table('expenses', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->dropForeign(['team_id']);
+            $table->dropForeign(['category_id']);
+            $table->dropForeign(['currency_id']);
+        });
 
         Schema::dropIfExists('expenses');
     }

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
@@ -29,7 +28,8 @@ class UserService
     {
         $currentUser = Auth::user();
         $isСontact = $this->contactService->hasContact($currentUser, $contactUser);
-        $mutualContact = $this->contactService->hasMutualContact($currentUser, $contactUser);
+        // TODO refactor isMutualContact
+        $isMutualContact = $this->contactService->hasMutualContact($currentUser, $contactUser);
         $isSameUser = $currentUser->getKey() === $contactUser->getKey();
         if ($contactUser->file && Storage::disk('private')->exists($contactUser->file->path)) {
             $fileUrl = asset($contactUser->file->path);

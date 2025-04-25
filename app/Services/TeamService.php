@@ -14,13 +14,7 @@ class TeamService
     public function createTeamPage()
     {
         $currentUser = Auth::user();
-        $apiToken = request()->session()->get('api_token');
 
-        if (!$apiToken) {
-            $token = $currentUser->createToken('api_token');
-            $apiToken = $token->plainTextToken;
-            request()->session()->put('api_token', $apiToken);
-        }
         $contacts = $currentUser->contacts()->with('contactUser')->get()->map(function ($contact) {
             return [
                 'id' => $contact->id,

@@ -37,7 +37,7 @@ class ContactService
     {
         if (!$this->hasContact($currentUser, $contactUser)) {
             return $currentUser->contacts()->create([
-                'contact_id' => $contactUser->id,
+                'contact_id' => $contactUser->getKey(),
                 'status' => 'pending'
             ]);
         }
@@ -45,30 +45,31 @@ class ContactService
         return false;
     }
 
-    public function removeContact(User $currentUser, User $contactUser)
+    public function removeContact(User $currentUser, User $contactUser): bool
     {
         return Contact::query()
-            ->where('user_id', $currentUser->id)
-            ->where('contact_id', $contactUser->id)
+            ->where('user_id', $currentUser->getKey())
+            ->where('contact_id', $contactUser->getKey())
             ->delete();
     }
 
     public function hasContact(User $currentUser, User $contactUser): bool
     {
         return Contact::query()
-            ->where('user_id', $currentUser->id)
-            ->where('contact_id', $contactUser->id)
+            ->where('user_id', $currentUser->getKey())
+            ->where('contact_id', $contactUser->getKey())
             ->exists();
     }
 
     public function hasMutualContact(User $currentUser, User $contactUser): bool
     {
         return Contact::query()
-            ->where('user_id', $currentUser->id)
-            ->where('contact_id', $contactUser->id)
-            ->exists() && Contact::query()
-            ->where('user_id', $contactUser->id)
-            ->where('contact_id', $currentUser->id)
-            ->exists();
+                ->where('user_id', $currentUser->getKey())
+                ->where('contact_id', $contactUser->getKey())
+                ->exists() &&
+            Contact::query()
+                ->where('user_id', $contactUser->getKey())
+                ->where('contact_id', $currentUser->getKey())
+                ->exists();
     }
 }

@@ -18,7 +18,6 @@ describe('route user index', function () {
 
         $response->assertStatus(200);
     });
-
     test('show all users page with users authorised', function () {
         $users = User::factory()->count(10)->create();
 
@@ -30,13 +29,11 @@ describe('route user index', function () {
                 ->has('users', 10)
             );
     });
-
     test('redirect to login page', function () {
         $this->get(route('users.index'))
             ->assertStatus(302)
             ->assertRedirect(route('login'));
     });
-
     test('redirect to verification page', function () {
         $user = User::factory()->create(['email_verified_at' => null]);
 
@@ -46,7 +43,6 @@ describe('route user index', function () {
             ->assertStatus(302)
             ->assertRedirect(route('verification.notice'));
     });
-
 });
 
 describe('route user show', function () {
@@ -258,8 +254,48 @@ describe('route user show', function () {
                 ->where('profile.phone', null)
                 ->where('files.0.path', null)
             )
-            ->has('isContact', true)
-//            ->has('isSameUser', false)
+            ->where('isContact', true)
+            ->where('isSameUser', false)
         );
+    });
+    test('show user page same user', function () {
+        $authUser = User::factory()->create(['name' => 'Test User']);
+
+        actingAs($authUser);
+
+        $this->get(route('users.show', ['user' => $authUser->getKey()]))
+        ->assertOk()
+        ->assertInertia(fn(Assert $page) => $page
+            ->component('Users/UserPage')
+            ->has('user', fn(Assert $page) => $page
+                ->where('id', $authUser->getKey())
+                ->where('name', 'Test User')
+                ->where('profile.phone', null)
+                ->where('files.0.path', null)
+            )
+            ->where('isContact', false)
+            ->where('isSameUser', true)
+        );
+    });
+    test('show user page unknown user', function () {
+        $authUser = User::factory()->create();
+
+        $userToShow = User::factory()->create(['name' => 'Test User']);
+
+        actingAs($authUser);
+
+        $this->get(route('users.show', ['user' => $userToShow->getKey()]))
+            ->assertOk()
+            ->assertInertia(fn(Assert $page) => $page
+                ->component('Users/UserPage')
+                ->has('user', fn(Assert $page) => $page
+                    ->where('id', $userToShow->getKey())
+                    ->where('name', 'Test User')
+                    ->where('profile.phone', null)
+                    ->where('files.0.path', null)
+                )
+                ->where('isContact', false)
+                ->where('isSameUser', false)
+            );
     });
 });

@@ -29,7 +29,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // TODO видаляти відношення спояатку
+        Schema::table('messages', function (Blueprint $table) {
+            $table->dropForeign(['chat_id']);
+            $table->dropForeign(['sender_id']);
+            $table->dropForeign(['recipient_id']);
+        });
 
         Schema::dropIfExists('messages');
     }

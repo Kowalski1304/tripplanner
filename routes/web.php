@@ -1,9 +1,19 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+
+require __DIR__.'/auth.php';
+
+Route::get('private-file/{path}', function ($path) {
+    return Storage::disk('private')->response('team_files/' . $path);
+})->middleware('auth', 'signed')->name('private.file');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -14,8 +24,10 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+Route::get('/dashboard', function (Request $request) {
+    return Inertia::render('Dashboard', [
+        'apiToken' => $request->apiToken
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -24,4 +36,19 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::prefix('users')
+    ->middleware(['auth', 'verified'])
+    ->controller(UserController::class)
+    ->group(function () {
+    Route::get('/', 'index')->name('users.index');
+    Route::get('/{user}', 'show')->name('users.show');
+
+});
+Route::prefix('team')
+    ->middleware(['auth', 'verified'])
+    ->controller(TeamController::class)
+    ->group(function () {
+        Route::get('/', 'createTeamPage')->name('team.index');
+//        Route::get('/{user}', 'show')->name('users.show');
+    });
+

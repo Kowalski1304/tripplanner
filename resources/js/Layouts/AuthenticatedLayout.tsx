@@ -22,7 +22,8 @@ export default function Authenticated({
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                                    <ApplicationLogo
+                                        className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200"/>
                                 </Link>
                             </div>
 
@@ -34,6 +35,15 @@ export default function Authenticated({
                                     Dashboard
                                 </NavLink>
                             </div>
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink
+                                    href={route('users.index')}
+                                    active={route().current('users.index')}
+                                >
+                                    Users
+                                </NavLink>
+                            </div>
+
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">

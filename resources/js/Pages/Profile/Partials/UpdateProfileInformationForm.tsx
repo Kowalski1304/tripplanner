@@ -23,7 +23,7 @@ export default function UpdateProfileInformation({
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [photoPreview, setPhotoPreview] = useState<string | null>(user.files ? `/storage/${user.files.path}` : null)
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm({
         name: user.name,
         email: user.email,
         avatar: null as File | null,
@@ -32,16 +32,7 @@ export default function UpdateProfileInformation({
     const submit: FormEventHandler = (e) => {
         e.preventDefault()
 
-        const formData = new FormData()
-        formData.append("name", data.name)
-        formData.append("email", data.email)
-        if (data.avatar) {
-            formData.append("avatar", data.avatar)
-            console.log("Appending avatar to form data:", data.avatar)
-        }
-
-        patch(route("profile.update"), {
-            data: formData,
+        post(route("profile.update"), {
             forceFormData: true,
         })
     }
@@ -107,6 +98,7 @@ export default function UpdateProfileInformation({
                     </div>
                     <input
                         type="file"
+                        id="avatar"
                         name="avatar"
                         ref={fileInputRef}
                         onChange={handlePhotoChange}

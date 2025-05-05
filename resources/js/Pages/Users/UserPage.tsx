@@ -1,9 +1,9 @@
 "use client"
 
 import { Link } from "@inertiajs/react"
-import { useState } from "react"
-import axios from 'axios';
+import { useState, useEffect } from "react"
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useWebSocket } from '@/Hooks/useWebSocket';
 
 interface User {
     id: number
@@ -22,35 +22,32 @@ interface User {
 interface Props {
     user: User
     isContact: boolean
+    broadcastChannel: string
 }
 
-export default function PublicProfile({ user, isContact = false }: Props) {
+export default function PublicProfile({ user, isContact = false, broadcastChannel }: Props) {
     const [isInContacts, setIsInContacts] = useState(isContact)
     const [loading, setLoading] = useState(false)
+    const { sendMessage, lastMessage } = useWebSocket(broadcastChannel);
+
+    useEffect(() => {
+        if (lastMessage) {
+            const data = JSON.parse(lastMessage.data);
+            if (data.type === 'contact_status') {
+                setIsInContacts(data.isContact);
+            }
+        }
+    }, [lastMessage]);
 
     const handleAddContact = async () => {
         try {
-            const token = localStorage.getItem('api_token');
-            const response = await axios.post(`/api/contacts/add/${user.id}`, {}, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                withCredentials: true
+            setLoading(true);
+            sendMessage({
+                type: 'add_contact',
+                userId: user.id
             });
-
-            if (response.status === 200 || response.status === 201) {
-                setIsInContacts(true);
-                return true;
-            }
-            return false;
         } catch (error) {
             console.error('Error adding contact:', error);
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                window.location.href = '/login';
-            }
-            return false;
         } finally {
             setLoading(false);
         }
@@ -58,28 +55,13 @@ export default function PublicProfile({ user, isContact = false }: Props) {
 
     const handleDeleteContact = async () => {
         try {
-            const token = localStorage.getItem('api_token');
-
-            const response = await axios.delete(`/api/contacts/remove/${user.id}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                withCredentials: true
+            setLoading(true);
+            sendMessage({
+                type: 'remove_contact',
+                userId: user.id
             });
-
-            if (response.status === 201) {
-                setIsInContacts(false);
-                return true;
-            }
-            return false;
         } catch (error) {
-            console.error('Error adding contact:', error);
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                window.location.href = '/login';
-            }
-            return false;
+            console.error('Error removing contact:', error);
         } finally {
             setLoading(false);
         }
@@ -159,22 +141,6 @@ export default function PublicProfile({ user, isContact = false }: Props) {
                                             В контактах
                                         </button>
                                     )}
-
-                                    <Link
-                                        // href={route("messages.create", { userId: user.id })}
-                                        className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="mr-2 h-5 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                        >
-                                            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
-                                            <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
-                                        </svg>
-                                        Написати
-                                    </Link>
                                 </div>
                             </div>
 

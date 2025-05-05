@@ -1,64 +1,72 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useRef, useState} from 'react';
+"use client"
+
+import type React from "react"
+
+import InputError from "@/Components/InputError"
+import InputLabel from "@/Components/InputLabel"
+import PrimaryButton from "@/Components/PrimaryButton"
+import TextInput from "@/Components/TextInput"
+import { Transition } from "@headlessui/react"
+import { Link, useForm, usePage } from "@inertiajs/react"
+import { type FormEventHandler, useRef, useState } from "react"
 
 export default function UpdateProfileInformation({
-    mustVerifyEmail,
-    status,
-    className = '',
-}: {
-    mustVerifyEmail: boolean;
-    status?: string;
-    className?: string;
+                                                     mustVerifyEmail,
+                                                     status,
+                                                     className = "",
+                                                 }: {
+    mustVerifyEmail: boolean
+    status?: string
+    className?: string
 }) {
-    const user = usePage().props.auth.user;
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [photoPreview, setPhotoPreview] = useState<string | null>(
-        user.files ? `/storage/${user.files.path}` : null
-    );
+    const user = usePage().props.auth.user
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [photoPreview, setPhotoPreview] = useState<string | null>(user.files ? `/storage/${user.files.path}` : null)
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-            avatar: null as File | null,
-        });
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+        name: user.name,
+        email: user.email,
+        avatar: null as File | null,
+    })
 
     const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+        e.preventDefault()
 
-        patch(route('profile.update'), {
+        const formData = new FormData()
+        formData.append("name", data.name)
+        formData.append("email", data.email)
+        if (data.avatar) {
+            formData.append("avatar", data.avatar)
+            console.log("Appending avatar to form data:", data.avatar)
+        }
+
+        patch(route("profile.update"), {
+            data: formData,
             forceFormData: true,
-        });
-    };
+        })
+    }
 
     const handlePhotoClick = () => {
-        fileInputRef.current?.click();
-    };
+        fileInputRef.current?.click()
+    }
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setData('avatar', file);
+            const file = e.target.files[0]
+            setData("avatar", file)
 
-            const reader = new FileReader();
+            const reader = new FileReader()
             reader.onload = (e) => {
-                setPhotoPreview(e.target?.result as string);
-            };
-            reader.readAsDataURL(file);
+                setPhotoPreview(e.target?.result as string)
+            }
+            reader.readAsDataURL(file)
         }
-    };
+    }
 
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Profile Information
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Profile Information</h2>
 
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Update your account's profile information and email address.
@@ -73,7 +81,7 @@ export default function UpdateProfileInformation({
                     >
                         {photoPreview ? (
                             <img
-                                src={photoPreview}
+                                src={photoPreview || "/placeholder.svg"}
                                 alt="Profile Photo"
                                 className="w-full h-full object-cover"
                             />
@@ -110,35 +118,35 @@ export default function UpdateProfileInformation({
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="name" value="Name"/>
+                    <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
                         value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData("name", e.target.value)}
                         required
                         isFocused
                         autoComplete="name"
                     />
 
-                    <InputError className="mt-2" message={errors.name}/>
+                    <InputError className="mt-2" message={errors.name} />
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email"/>
+                    <InputLabel htmlFor="email" value="Email" />
 
                     <TextInput
                         id="email"
                         type="email"
                         className="mt-1 block w-full"
                         value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => setData("email", e.target.value)}
                         required
                         autoComplete="username"
                     />
 
-                    <InputError className="mt-2" message={errors.email}/>
+                    <InputError className="mt-2" message={errors.email} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
@@ -146,7 +154,7 @@ export default function UpdateProfileInformation({
                         <p className="mt-2 text-sm text-gray-800 dark:text-gray-200">
                             Your email address is unverified.
                             <Link
-                                href={route('verification.send')}
+                                href={route("verification.send")}
                                 method="post"
                                 as="button"
                                 className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
@@ -155,17 +163,16 @@ export default function UpdateProfileInformation({
                             </Link>
                         </p>
 
-                        {status === 'verification-link-sent' && (
+                        {status === "verification-link-sent" && (
                             <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                                A new verification link has been sent to your
-                                email address.
+                                A new verification link has been sent to your email address.
                             </div>
                         )}
                     </div>
                 )}
 
                 <div className="flex items-center gap-4">
-                <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -174,12 +181,10 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
-                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Saved.</p>
                     </Transition>
                 </div>
             </form>
         </section>
-    );
+    )
 }

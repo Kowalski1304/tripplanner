@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WebSocketController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -24,11 +25,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function (Request $request) {
-    return Inertia::render('Dashboard', [
-        'apiToken' => $request->apiToken
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,18 +36,21 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::prefix('users')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->controller(UserController::class)
     ->group(function () {
-    Route::get('/', 'index')->name('users.index');
-    Route::get('/{user}', 'show')->name('users.show');
+        Route::get('/', 'index')->name('users.index');
+        Route::get('/{user}', 'show')->name('users.show');
+    });
 
-});
 Route::prefix('team')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->controller(TeamController::class)
     ->group(function () {
         Route::get('/', 'createTeamPage')->name('team.index');
-//        Route::get('/{user}', 'show')->name('users.show');
     });
+
+Route::post('/ws/message', [WebSocketController::class, 'handleMessage'])
+    ->middleware(['auth'])
+    ->name('ws.message');
 

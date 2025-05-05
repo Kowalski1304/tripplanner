@@ -7,20 +7,33 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Broadcast;
 
 class UserService
 {
-    public function __construct(private readonly ContactService $contactService)
-    {
+    public function __construct(
+        private readonly ContactService $contactService,
+        private readonly FileService $fileService
+    ) {
     }
+
     public function getAllUsersPage(): Response
     {
         $users = User::query()
             ->select(['id', 'name'])
-            ->get();
+            ->with('file')
+            ->get()
+            ->map(function (User $user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar' => $this->fileService->getAvatarUrl($user->file)
+                ];
+            });
 
         return Inertia::render('Users/Index', [
             'users' => $users,
+            'broadcastChannel' => 'users',
         ]);
     }
 
@@ -31,6 +44,8 @@ class UserService
         // TODO refactor isMutualContact
         $isMutualContact = $this->contactService->hasMutualContact($currentUser, $contactUser);
         $isSameUser = $currentUser->getKey() === $contactUser->getKey();
+        
+        $fileUrl = null;
         if ($contactUser->file && Storage::disk('private')->exists($contactUser->file->path)) {
             $fileUrl = asset($contactUser->file->path);
         }
@@ -42,15 +57,11 @@ class UserService
                 'profile' => [
                     'phone' => $contactUser->profile?->phone,
                 ],
-                'files' => [
-                    [
-                        'id' => $contactUser->files?->getKey(),
-                        'path' => $fileUrl ?? null,
-                    ]
-                ],
+                'avatar' => $this->fileService->getAvatarUrl($contactUser->file),
             ],
             'isContact' => $isСontact,
             'isSameUser' => $isSameUser,
+            'broadcastChannel' => 'user.' . $contactUser->id,
         ]);
     }
 

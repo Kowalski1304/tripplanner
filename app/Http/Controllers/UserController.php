@@ -17,12 +17,11 @@ class UserController extends Controller
      */
     public function index(): Response
     {
-       return $this->userService->getAllUsersPage();
+        return $this->userService->getAllUsersPage();
     }
 
     public function show(User $user): Response
     {
-       return $this->userService->show($user);
+        return $this->userService->show($user);
     }
-
 }

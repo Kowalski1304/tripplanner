@@ -15,7 +15,7 @@ export interface User {
     name: string;
     email: string;
     email_verified_at?: string;
-    files?: File | null;
+    file?: File | null;
 }
 
 export type PageProps<
